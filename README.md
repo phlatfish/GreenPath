@@ -48,7 +48,7 @@ Input your location, and where you want to go. Then, many public transportation 
 GreenPath focuses on a simplistic web design, for maximum user experience, and a modern, sleek user interface. With reduced distractions, this effectively carries the purpose, motivation, and essence of GreenPath. According to Website Magazine, “Simple design makes it easy to draw the viewer's eye to the most important area of the page - and, if you're looking for conversions, that's your call to action. Navigating a cluttered interface is no fun. It can be confusing, overwhelming, and frustrating"(Lundin).
 
 ## Extensibility
-We plan to further expand the potential of GreenPath, making it more diverse, widespread, and effective. In the future, we can input more data, to get a better comprehension of different locations, and the needs of people. Additionally, we can ask the user for their preferred form of transportation, and use this information to keep our experience consistent. Moreover, we can pursue more clean transportation methods, by partnering with electric vehicle companies to better GreenPath.
+We plan to further expand the potential of GreenPath, making it more diverse, widespread, and effective. In the future, we can input more data, to get a better comprehension of different locations, and the needs of people. Additionally, we can ask the user for their preferred form of transportation, and use this information to keep our experience consistent. Moreover, we can pursue more clean transportation methods, by partnering with electric vehicle companies to better GreenPath. We also plan to make GreenPath more applicable to our local NJ communities, by receiving data appropriate for our program.
 
 
 ## Customization
