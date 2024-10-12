@@ -42,6 +42,7 @@ GreenPath is designated to reduce greenhouse gases that come from transportation
 
 
 ## Usage
+
 Input your location, and where you want to go. Then, many public transportation options will appear for you, an alternative to less sustainable methods.
 
 ## Simplicity
@@ -49,10 +50,15 @@ Input your location, and where you want to go. Then, many public transportation 
 GreenPath focuses on a simplistic web design, for maximum user experience, and a modern, sleek user interface. With reduced distractions, this effectively carries the purpose, motivation, and essence of GreenPath. According to Website Magazine, “Simple design makes it easy to draw the viewer's eye to the most important area of the page - and, if you're looking for conversions, that's your call to action. Navigating a cluttered interface is no fun. It can be confusing, overwhelming, and frustrating"(Lundin).
 
 ## Extensibility
+
 We plan to further expand the potential of GreenPath, making it more diverse, widespread, and effective. In the future, we can input more data, to get a better comprehension of different locations, and the needs of people. Additionally, we can ask the user for their preferred form of transportation, and use this information to keep our experience consistent. Moreover, we can pursue more clean transportation methods, by partnering with electric vehicle companies to better GreenPath. We also plan to make GreenPath more applicable to our local NJ communities, by receiving data closer to use, instead of in Germany.
 
+## Sources
+
+Website Magazine
 
 ## Customization
+
 Experienced developers may want to customize the project further. You can modify the code to change the appearance of the homepage, add additional features, or integrate it into other web applications.
 
 
