@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <style>
+        #map { height: 600px; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map').setView([40, -74], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap contributors'}).addTo(map);
+
+    var railStations = [];
+    var busStations = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/search')
+            .then(response => response.json())
+            .then(data => {
+                data.features.forEach(function(feature) {
+                    var latlng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                    var marker = L.marker(latlng, {icon: getIcon(feature.properties.transport)});
+                    
+                    if (feature.properties.transport === 'rail') {
+                        railStations.push(marker);
+                    } else {
+                        busStations.push(marker);
+                    }
+
+                    marker.addTo(map);
+                    marker.bindPopup('<strong>' + feature.properties.name + '</strong>');
+                });
+
+                map.fitBounds(L.featureGroup(railStations.concat(busStations)).getBounds());
+            });
+    });
+
+    function getIcon(type) {
+        switch(type) {
+            case 'rail':
+                return L.icon({
+                    iconUrl: '/static/images/rail-icon.png',
+                    iconSize: [38, 95],
+                    iconAnchor: [22, 94],
+                    popupAnchor: [-3, 76],
+                    tooltipAnchor: [13, 41],
+                    shadowSize: [0, 0]
+                });
+            case 'bus':
+                return L.icon({
+                    iconUrl: '/static/images/bus-icon.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [-21, 11],
+                    tooltipAnchor: [13, 41],
+                    shadowSize: [0, 0]
+                });
+            default:
+                return null;
+        }
+    }
+</script>
+</body>
+</html>
