@@ -1,7 +1,7 @@
 # GreenPath
 
 > [!IMPORTANT]  
-> **.**
+> RUNNING THE THING: INSTALL ALL THE REQUIRMENTS AND RUN flask --app app run
 
 Devpost: 
 
