@@ -1,26 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Train Station</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="static/styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1 class="text-center">Find Train Station</h1>
+from flask import Flask, render_template, request
+from deutsche_bahn_api import StationHelper, ApiAuthentication
+from deutsche_bahn_api.exceptions import ApiException
 
-        <form method="POST" action="{{ url_for('fetch_timetable') }}">
-            <div class="form-group">
-                <label for="transport_type">Station Name:</label>
-                <input type="text" id="transport_type" name="transport_type" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Get Timetable</button>
-        </form>
-    </div>
+app = Flask(__name__)
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@app.route('/', methods=['GET'])
+def index():
+    return render_template("search.html")
+
+@app.route('/fetch-timetable', methods=['GET', 'POST'])
+def fetch_timetable():
+    if request.method == 'POST':
+        station_name = request.form.get('transport_type')
+        try:
+            api_auth = ApiAuthentication('YOUR_API_KEY_HERE')
+            station_helper = StationHelper()
+            found_station = station_helper.find_stations_by_name(station_name)[0]
+            timetable_helper = TimetableHelper(found_station, api_auth)
+            trains = timetable_helper.get_timetable()
+            timetable_helper = TimetableHelper(found_station, api_auth)
+            timetable_changes = timetable_helper.get_timetable_changes(trains)
+            timetable_data = [
+                {
+                    'train_number': train.train_number,
+                    'destination': train.destination,
+                    'departure_time': train.departure_time.strftime('%H:%M'),
+                    'platform': train.platform,
+                    'changes': change.change_type if change else None
+                } for train, change in zip(trains, timetable_changes)
+            ]
+            
+            return render_template('timetable.html', station_name=station_name, timetable_data=timetable_data)
+        except ApiException as e:
+            return render_template('error.html', error=str(e))
+    
+    return render_template('search.html')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)
