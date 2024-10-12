@@ -93,6 +93,10 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
+@app.route('/location')
+def location():
+    return render_template("location.html")
+
 @app.route('/')
 def index():
     return render_template("index.html")
