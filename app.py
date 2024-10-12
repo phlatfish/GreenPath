@@ -1,140 +1,50 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
-from flask_login import UserMixin, LoginManager, login_user, logout_user, current_user, login_required
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, redirect, url_for, flash
 from flask_wtf import FlaskForm
-from flask_bcrypt import Bcrypt
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField, RadioField
-from wtforms.validators import DataRequired, Optional, Length, Regexp
-from werkzeug.utils import secure_filename
-from sqlalchemy.orm import joinedload
-from datetime import datetime
-import os
-import csv
-
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
+import deutsche_bahn_api
+from deutsche_bahn_api import StationHelper, TimetableHelper, ApiAuthentication
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'QWERTYUIOP'
-app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite:///db.sqlite'
-
-db = SQLAlchemy()
-bcrypt = Bcrypt(app)
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-login_manager.login_message_category = 'info'
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(128), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False)
-
-db.init_app(app)
-app.app_context().push()
-db.create_all()
-
-class SignUpForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(),
-        Length(min=3, max=10),
-        Regexp(r'^[a-zA-Z0-9_]*$', message="Username must only contain letters, numbers, and underscores.")
-    ])
-    password = PasswordField('Password', validators=[
-        DataRequired(),
-        Length(min=8, max=16),
-        Regexp(r'^[a-zA-Z0-9+=-_]*$', message="Password must contain only letters, numbers, and the +=-_ characters.")
-    ])
-    submit = SubmitField('Sign Up')
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Log In')
+app.config['SECRET_KEY'] = 'your_secret_key_here'
 
 class SearchForm(FlaskForm):
-    transport_type = RadioField('Transport Type', choices=[('rail', 'Rail'), ('bus', 'Bus')])
+    station_name = StringField('Station Name', validators=[DataRequired()])
     submit = SubmitField('Search')
 
-@app.route('/signup', methods=["GET", "POST"])
-def sign_up():
-    form = SignUpForm()
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    elif form.validate_on_submit():
-        existing_user = User.query.filter_by(username=form.username.data).first()
-        if existing_user:
-            flash('That username is already taken. Please choose a different one.', 'danger')
-            return render_template('signup.html', signup_form=form)
-        else:
-            user = User(username=form.username.data, password=bcrypt.generate_password_hash(form.password.data).decode('utf-8'))
-            db.session.add(user)
-            db.session.commit()
-            login_user(user)
-            next_url = request.args.get('next', url_for('index')) 
-            return redirect(next_url)
-    return render_template('signup.html', signup_form=form)
-
-@app.route('/login', methods=["GET", "POST"])
-def login():
-    form = LoginForm()
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    elif form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user)
-            return redirect(url_for('index'))
-        else:
-            flash('Incorrect username or password. Try again.', 'danger')
-            return render_template('login.html', login_form=form)
-    return render_template('login.html', login_form=form)
-
-@app.route("/logout")
-def logout():
-    logout_user()
-    return redirect(url_for("index"))
-
-@app.route('/search', methods=["GET", "POST"])
-def search():
+@app.route('/', methods=['GET', 'POST'])
+def index():
     form = SearchForm()
-    stations = []
-    
     if form.validate_on_submit():
-        transport_type = form.transport_type.data
+        # Simplified station search
+        station_helper = StationHelper()
+        stations = station_helper.find_stations_by_name(form.station_name.data)
         
-        if transport_type == 'rail':
-            csv_file = os.path.join(APP_ROOT, 'njrail.csv')
-        elif transport_type == 'bus':
-            csv_file = os.path.join(APP_ROOT, 'njbus.csv')
-        
-        with open(csv_file, 'r') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                stations.append({
-                    'lat': float(row['LATITUDE']) if transport_type == 'rail' else float(row['DLAT_GIS']),
-                    'lng': float(row['LONGITUDE']) if transport_type == 'rail' else float(row['DLONG_GIS']),
-                    'name': row['MUNICIPALITY']
-                })
-        
-        return render_template('location.html', stations=stations)
+        if stations:
+            return redirect(url_for('timetable', station_id=stations[0].id))
+        else:
+            flash('Station not found.', 'error')
     
     return render_template('search.html', form=form)
 
-@app.route('/location')
-def location():
-    return render_template("location.html")
+@app.route('/timetable/<int:station_id>')
+def timetable(station_id):
+    api_auth = ApiAuthentication("1dce76c7798e66b4a324360281c3fca7", "45341ce84c462ebd3ad4cd1a1781223e")
+    success = api_auth.test_credentials()
+    if not success:
+        flash('API authentication failed. Please check your credentials.', 'error')
+        return redirect(url_for('index'))
 
-@app.route('/')
-def index():
-    return render_template("index.html")
+    station_helper = StationHelper()
+    station = station_helper.find_station_by_id(station_id)
+    if not station:
+        flash('Invalid station ID.', 'error')
+        return redirect(url_for('index'))
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
+    timetable_helper = TimetableHelper(station, api_auth)
+    trains = timetable_helper.get_timetable()
+
+    return render_template('timetable.html', trains=trains)
 
 if __name__ == '__main__':
     app.run(debug=True)
