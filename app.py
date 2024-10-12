@@ -73,7 +73,7 @@ def sign_up():
             login_user(user)
             next_url = request.args.get('next', url_for('index')) 
             return redirect(next_url)
-    return render_template('signup.html', signup_form=form, forums=forums)
+    return render_template('signup.html', signup_form=form)
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -89,9 +89,21 @@ def login():
         else:
             flash('Incorrect username or password. Try again.', 'danger')
             return render_template('login.html', login_form=form)
-    return render_template('login.html', login_form=form, forums=forums)
+    return render_template('login.html', login_form=form)
 
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for("index"))
+
+@app.route('/')
+def index():
+    forums = Forum.query.all()
+    return render_template("index.html")
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)
