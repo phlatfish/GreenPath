@@ -1,0 +1,23 @@
+<h1 class="text-center">Sign Up for Blueberry</h1>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="list-group flashes text-danger">
+    {% for message in messages %}
+    <li class="list-group-item">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<form method="POST" action="">
+    {{ signup_form.hidden_tag() }}
+    <div class="form-group">
+        <label for="username">Username</label>
+        {{ signup_form.username(class="form-control") }}
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        {{ signup_form.password(class="form-control") }}
+    </div>
+    {{ signup_form.submit(class="btn btn-primary btn-block") }}
+</form>
+<p>Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
