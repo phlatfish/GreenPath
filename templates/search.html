@@ -1,44 +1,13 @@
-from flask import Flask, render_template, request
-from deutsche_bahn_api import StationHelper, ApiAuthentication
-from deutsche_bahn_api.exceptions import ApiException
+{% extends "base.html" %}
 
-app = Flask(__name__)
-
-@app.route('/', methods=['GET'])
-def index():
-    return render_template("search.html")
-
-@app.route('/fetch-timetable', methods=['GET', 'POST'])
-def fetch_timetable():
-    if request.method == 'POST':
-        station_name = request.form.get('transport_type')
-        try:
-            api_auth = ApiAuthentication('YOUR_API_KEY_HERE')
-            station_helper = StationHelper()
-            found_station = station_helper.find_stations_by_name(station_name)[0]
-            timetable_helper = TimetableHelper(found_station, api_auth)
-            trains = timetable_helper.get_timetable()
-            timetable_helper = TimetableHelper(found_station, api_auth)
-            timetable_changes = timetable_helper.get_timetable_changes(trains)
-            timetable_data = [
-                {
-                    'train_number': train.train_number,
-                    'destination': train.destination,
-                    'departure_time': train.departure_time.strftime('%H:%M'),
-                    'platform': train.platform,
-                    'changes': change.change_type if change else None
-                } for train, change in zip(trains, timetable_changes)
-            ]
-            
-            return render_template('timetable.html', station_name=station_name, timetable_data=timetable_data)
-        except ApiException as e:
-            return render_template('error.html', error=str(e))
-    
-    return render_template('search.html')
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-if __name__ == '__main__':
-    app.run(debug=True)
+{% block content %}
+<h1>Find Train Schedule</h1>
+<form action="{{ url_for('index') }}" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.station_name.label }}<br>
+        {{ form.station_name(size=50) }}
+    </div>
+    <div>{{ form.submit() }}</div>
+</form>
+{% endblock %}
