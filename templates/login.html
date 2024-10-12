@@ -1,0 +1,23 @@
+<h1 class="text-center">Log In to Your Account</h1>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="list-group flashes text-danger">
+    {% for message in messages %}
+    <li class="list-group-item">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<form method="POST" action="">
+    {{ login_form.hidden_tag() }}
+    <div class="form-group">
+        <label for="username">Username</label>
+        {{ login_form.username(class="form-control") }}
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        {{ login_form.password(class="form-control") }}
+    </div>
+    {{ login_form.submit(class="btn btn-primary btn-block") }}
+</form>
+<p>Don't have an account? <a href="{{ url_for('sign_up', next=request.args.get('next', '')) }}">Sign Up</a></p>
