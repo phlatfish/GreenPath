@@ -5,14 +5,13 @@
 
 Devpost: 
 
-## A visually appealing wiki page to reduce confusion within the community
+## An application that allows users to find eco-sustainable public transport methods.
 
-GreenPath is an application that allows users to find eco-sustainable public transport near them, such as trains and buses. It aims to help aid the climate change crisis, which is constantly ongoing. By increasing public transport usage, and reducing carbon emissions released from excessive vehicles, GreenPath is working towards a cleaner planet in the future, while helping communities thrive and succeed.
 
 This project is made for BRCyberHacks by **Tharun Naguleswaran, Dhruv Rakhade, Shubham Roy-Choudhury, and Anshuman Roy**.
 
 ## Table of Contents
-- [Blaze](#blaze)
+- [GreenPath](#blaze)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Our Purpose](#our-purpose)
@@ -25,19 +24,18 @@ This project is made for BRCyberHacks by **Tharun Naguleswaran, Dhruv Rakhade, S
 
 ## Introduction
 
-Blaze is a simple yet powerful tool that enables users to create their own informatic pages about the community and share information with the public. Whether you are interested in helping the community, a student, or a developer looking to learn and experiment with Flask, this project offers something for everyone.
+GreenPath is an application that allows users to find eco-sustainable public transport near them, such as trains and buses. It aims to help aid the climate change crisis, which is constantly ongoing. By increasing public transport usage, and reducing carbon emissions released from excessive vehicles, GreenPath is working towards a cleaner planet in the future, while helping communities thrive and succeed.
 
 ## Our Purpose
 
-Blaze is designed to make people of all races, ethnicities, genders, and more feel comfortable in a safe, caring online community. From advocating for diversity and creativity, to allowing users to create multicultural pages with factual information, kindness and welcoming are indispensable in Blaze. We want to aid different communities, and help them vocalize their information, accomplishments, and more. 
+GreenPath is designated to reduce greenhouse gases that come from transportation. In fact, according to the United States Environmental Protection Agency, "​Greenhouse gas (GHG) emissions from transportation account for about 28 percent of total U.S. greenhouse gas emissions, making it the largest contributor of U.S. GHG emissions. Between 1990 and 2022, GHG emissions in the transportation sector increased more in absolute terms than any other sector." 
 
 ### Key Features
 
-- Creating wikis in Markdown
-- A user-friendly web interface
-- Real-time wiki updates
-- A modern and sleek signup and login page
-- Beautifully curated user interface
+- Login to application.
+- Input place of transit.
+- Input preferred method of transportation.
+- Showcase results, and public transport available near the user.
 
 ## Getting Started
 
