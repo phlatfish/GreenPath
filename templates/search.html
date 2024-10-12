@@ -1,0 +1,20 @@
+<h1 class="text-center">Search for Stations</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="list-group flashes text-danger">
+    {% for message in messages %}
+    <li class="list-group-item">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.transport_type.label }}<br>
+        {{ form.transport_type() }}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+</form>

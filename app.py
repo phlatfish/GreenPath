@@ -3,12 +3,13 @@ from flask_login import UserMixin, LoginManager, login_user, logout_user, curren
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_bcrypt import Bcrypt
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField, RadioField
 from wtforms.validators import DataRequired, Optional, Length, Regexp
 from werkzeug.utils import secure_filename
 from sqlalchemy.orm import joinedload
 from datetime import datetime
 import os
+import csv
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -54,6 +55,10 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Log In')
 
+class SearchForm(FlaskForm):
+    transport_type = RadioField('Transport Type', choices=[('rail', 'Rail'), ('bus', 'Bus')])
+    submit = SubmitField('Search')
+
 @app.route('/signup', methods=["GET", "POST"])
 def sign_up():
     form = SignUpForm()
@@ -92,6 +97,32 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("index"))
+
+@app.route('/search', methods=["GET", "POST"])
+def search():
+    form = SearchForm()
+    stations = []
+    
+    if form.validate_on_submit():
+        transport_type = form.transport_type.data
+        
+        if transport_type == 'rail':
+            csv_file = os.path.join(APP_ROOT, 'njrail.csv')
+        elif transport_type == 'bus':
+            csv_file = os.path.join(APP_ROOT, 'njbus.csv')
+        
+        with open(csv_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                stations.append({
+                    'lat': float(row['LATITUDE']) if transport_type == 'rail' else float(row['DLAT_GIS']),
+                    'lng': float(row['LONGITUDE']) if transport_type == 'rail' else float(row['DLONG_GIS']),
+                    'name': row['MUNICIPALITY']
+                })
+        
+        return render_template('location.html', stations=stations)
+    
+    return render_template('search.html', form=form)
 
 @app.route('/location')
 def location():
