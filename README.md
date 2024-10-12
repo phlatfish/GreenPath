@@ -7,7 +7,7 @@ Devpost:
 
 ## A visually appealing wiki page to reduce confusion within the community
 
-GreenPath is an application allowing users to find eco-sustainable public transport near them, such as trains and buses. It aims to help aid the climate change crisis, which is constantly ongoing. By increasing public transport usage, and reducing carbon emissions GreenPath is working towards a cleaner planet in the future.
+GreenPath is an application that allows users to find eco-sustainable public transport near them, such as trains and buses. It aims to help aid the climate change crisis, which is constantly ongoing. By increasing public transport usage, and reducing carbon emissions released from excessive vehicles, GreenPath is working towards a cleaner planet in the future, while helping communities thrive and succeed.
 
 This project is made for BRCyberHacks by **Tharun Naguleswaran, Dhruv Rakhade, Shubham Roy-Choudhury, and Anshuman Roy**.
 
