@@ -8,7 +8,6 @@ from wtforms.validators import DataRequired, Optional, Length, Regexp
 from werkzeug.utils import secure_filename
 from sqlalchemy.orm import joinedload
 from datetime import datetime
-import markdown2
 import os
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -58,7 +57,6 @@ class LoginForm(FlaskForm):
 @app.route('/signup', methods=["GET", "POST"])
 def sign_up():
     form = SignUpForm()
-    forums = Forum.query.all()
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     elif form.validate_on_submit():
@@ -78,7 +76,6 @@ def sign_up():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     form = LoginForm()
-    forums = Forum.query.all()
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     elif form.validate_on_submit():
@@ -98,7 +95,6 @@ def logout():
 
 @app.route('/')
 def index():
-    forums = Forum.query.all()
     return render_template("index.html")
 
 @app.errorhandler(404)
