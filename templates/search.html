@@ -1,13 +1,25 @@
-{% extends "base.html" %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenPath</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+{% extends 'base.html' %}
+
+{% block title %} Search Trains {% endblock %}
 
 {% block content %}
-<h1>Find Train Schedule</h1>
-<form action="{{ url_for('index') }}" method="post">
+<h1>Train Schedule Search</h1>
+<form method="POST">
     {{ form.hidden_tag() }}
-    <div>
+    <p>
         {{ form.station_name.label }}<br>
         {{ form.station_name(size=50) }}
-    </div>
-    <div>{{ form.submit() }}</div>
+    </p>
+    <p>{{ form.submit() }}</p>
 </form>
+
 {% endblock %}

@@ -2,8 +2,9 @@ from flask import Flask, render_template, redirect, url_for, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
-import deutsche_bahn_api
-from deutsche_bahn_api import StationHelper, TimetableHelper, ApiAuthentication
+from deutsche_bahn_api.api_authentication import ApiAuthentication
+from deutsche_bahn_api.station_helper import StationHelper
+from deutsche_bahn_api.timetable_helper import TimetableHelper
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -12,39 +13,50 @@ class SearchForm(FlaskForm):
     station_name = StringField('Station Name', validators=[DataRequired()])
     submit = SubmitField('Search')
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
     form = SearchForm()
     if form.validate_on_submit():
-        # Simplified station search
+        api = ApiAuthentication("1dce76c7798e66b4a324360281c3fca7", "45341ce84c462ebd3ad4cd1a1781223e")
+        success: bool = api.test_credentials()
+
         station_helper = StationHelper()
-        stations = station_helper.find_stations_by_name(form.station_name.data)
+        station_helper.load_stations()
+        name = form.station_name.data
+        found_stations = station_helper.find_stations_by_name(name)
         
-        if stations:
-            return redirect(url_for('timetable', station_id=stations[0].id))
+        # Check if found_stations has elements
+        if found_stations:
+            timetable_helper = TimetableHelper(found_stations[0], api)
+            trains = timetable_helper.get_timetable(21)
+            trains_with_changes = timetable_helper.get_timetable_changes(trains)
+            
+            train_data = []
+            for train in trains_with_changes:
+                train_info = {}
+                if hasattr(train, 'train_number'):
+                    train_info['train_number'] = train.train_number
+                if hasattr(train, 'departure'):
+                    train_info['departure'] = train.departure
+                if hasattr(train, 'arrival'):
+                    train_info['arrival'] = train.arrival
+                if hasattr(train, 'stations'):
+                    train_info['stations'] = train.stations.split('|')
+                if hasattr(train, 'train_changes'):
+                    train_info['changes'] = train.train_changes.messages
+                
+                train_data.append(train_info)
+            
+            return render_template('timetable.html', form=form, train_data=train_data)
         else:
-            flash('Station not found.', 'error')
+            flash('No stations found matching the given name.', 'error')
+            return redirect(url_for('search'))
     
     return render_template('search.html', form=form)
-
-@app.route('/timetable/<int:station_id>')
-def timetable(station_id):
-    api_auth = ApiAuthentication("1dce76c7798e66b4a324360281c3fca7", "45341ce84c462ebd3ad4cd1a1781223e")
-    success = api_auth.test_credentials()
-    if not success:
-        flash('API authentication failed. Please check your credentials.', 'error')
-        return redirect(url_for('index'))
-
-    station_helper = StationHelper()
-    station = station_helper.find_station_by_id(station_id)
-    if not station:
-        flash('Invalid station ID.', 'error')
-        return redirect(url_for('index'))
-
-    timetable_helper = TimetableHelper(station, api_auth)
-    trains = timetable_helper.get_timetable()
-
-    return render_template('timetable.html', trains=trains)
 
 if __name__ == '__main__':
     app.run(debug=True)
